@@ -1,16 +1,18 @@
 # Partle Marketplace MCP Server
 
-A remote [Model Context Protocol](https://modelcontextprotocol.io/) server for searching products and stores in the Partle local marketplace.
+A remote [Model Context Protocol](https://modelcontextprotocol.io/) server for the Partle local marketplace — find products in physical stores near you.
 
 **Server URL:** `https://partle.rubenayla.xyz/mcp/`
 
-**Transport:** Streamable HTTP (no API key required)
+**Transport:** Streamable HTTP
 
 ## What is Partle?
 
 Partle helps you find specific products in physical stores near you. Instead of waiting for online delivery, find what you need at a local store today. Currently focused on hardware stores in Spain (~2400 products, ~4000 stores).
 
 ## Tools
+
+### Read (no auth required)
 
 | Tool | Description | Parameters |
 |------|-------------|------------|
@@ -19,6 +21,15 @@ Partle helps you find specific products in physical stores near you. Instead of 
 | `search_stores` | Search or list stores | `query`, `limit` |
 | `get_store` | Get store details by ID | `store_id` |
 | `get_stats` | Platform statistics | (none) |
+
+### Write (API key required)
+
+Generate an API key at [partle.rubenayla.xyz/account](https://partle.rubenayla.xyz/account).
+
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `create_product` | Create a new product listing | `api_key`, `name`, `description`, `price`, `currency`, `url`, `store_id` |
+| `upload_product_image` | Upload an image for a product (base64 or URL) | `api_key`, `product_id`, `image_base64`, `content_type`, `image_url` |
 
 ## Configuration
 

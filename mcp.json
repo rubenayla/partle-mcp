@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "partle": {
+      "url": "https://partle.rubenayla.xyz/mcp/",
+      "name": "Partle Marketplace",
+      "description": "Search products and stores in the Partle local marketplace. Find product availability, prices, and store locations."
+    }
+  }
+}
