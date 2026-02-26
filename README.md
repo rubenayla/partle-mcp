@@ -2,6 +2,10 @@
 
 A remote [Model Context Protocol](https://modelcontextprotocol.io/) server for the Partle local marketplace — find products in physical stores near you.
 
+<a href="https://glama.ai/mcp/servers/@rubenayla/partle">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@rubenayla/partle/badge" alt="Partle MCP server" />
+</a>
+
 **Server URL:** `https://partle.rubenayla.xyz/mcp/`
 
 **Transport:** Streamable HTTP
