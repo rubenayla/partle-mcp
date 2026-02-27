@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.rubenayla/partle",
+  "name": "xyz.rubenayla.partle/marketplace",
   "title": "Partle Marketplace",
   "description": "Search products and stores in nearby physical stores near you.",
   "version": "1.0.0",
