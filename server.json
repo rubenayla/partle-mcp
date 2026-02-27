@@ -1,0 +1,17 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.rubenayla/partle",
+  "title": "Partle Marketplace",
+  "description": "Search products and stores in nearby physical stores. Find what you need at a local store today instead of waiting for online delivery.",
+  "version": "1.0.0",
+  "repository": {
+    "url": "https://github.com/rubenayla/partle-mcp",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://partle.rubenayla.xyz/mcp/"
+    }
+  ]
+}
