@@ -1,71 +1,109 @@
 # Partle Marketplace MCP Server
 
-A remote [Model Context Protocol](https://modelcontextprotocol.io/) server for the Partle local marketplace — find products in physical stores near you.
+[Model Context Protocol](https://modelcontextprotocol.io/) server for the Partle local marketplace — find products in physical stores near you, ask an AI to add a listing for you, all without leaving your assistant.
 
-**Server URL:** `https://partle.rubenayla.xyz/mcp/`
+**130,000+ products** across **~16,000 stores**. Reads need no auth. Writes need a `pk_…` API key.
 
-**Transport:** Streamable HTTP
+## Two ways to run it
 
-## What is Partle?
+### Remote (recommended — zero setup)
 
-Partle helps you find specific products in physical stores near you. Instead of waiting for online delivery, find what you need at a local store today. Currently focused on hardware stores in Spain (~2400 products, ~4000 stores).
+Point your MCP client at:
 
-## Tools
+```
+https://partle.rubenayla.xyz/mcp/
+```
 
-### Read (no auth required)
+That's it. Streamable HTTP transport, MCP spec 2025-06-18. Per-client install instructions: [`/documentation/mcp-setup/`](https://partle.rubenayla.xyz/documentation/mcp-setup/).
 
-| Tool | Description | Parameters |
-|------|-------------|------------|
-| `search_products` | Search products by name or description | `query` (required), `min_price`, `max_price`, `tags`, `sort_by`, `limit` |
-| `get_product` | Get product details by ID | `product_id` |
-| `search_stores` | Search or list stores | `query`, `limit` |
-| `get_store` | Get store details by ID | `store_id` |
-| `get_stats` | Platform statistics | (none) |
+### Local stdio (for clients that prefer installable servers, or for Glama / Smithery scoring)
 
-### Write (API key required)
+```bash
+pip install partle-mcp
+partle-mcp
+```
 
-Generate an API key at [partle.rubenayla.xyz/account](https://partle.rubenayla.xyz/account).
+Or with `uvx` (no install):
 
-| Tool | Description | Parameters |
-|------|-------------|------------|
-| `create_product` | Create a new product listing | `api_key`, `name`, `description`, `price`, `currency`, `url`, `store_id` |
-| `upload_product_image` | Upload an image for a product (base64 or URL) | `api_key`, `product_id`, `image_base64`, `content_type`, `image_url` |
+```bash
+uvx partle-mcp
+```
 
-## Configuration
+Or with Docker:
 
-### Claude Code / Claude Desktop
+```bash
+docker run --rm -i ghcr.io/rubenayla/partle-mcp
+```
 
-Add to your MCP settings:
+The stdio package proxies to the public REST API at `https://partle.rubenayla.xyz`, so you don't need a database or local backend.
+
+#### Claude Desktop / Claude Code (stdio)
 
 ```json
 {
   "mcpServers": {
     "partle": {
-      "url": "https://partle.rubenayla.xyz/mcp/"
+      "command": "uvx",
+      "args": ["partle-mcp"]
     }
   }
 }
 ```
 
-### Discovery
+## Tools (12 total)
 
-MCP discovery file: `https://partle.rubenayla.xyz/.well-known/mcp.json`
+### Read (no auth)
+
+| Tool | Purpose |
+|------|---------|
+| `search_products` | Search the catalog by name, price range, tags, store. Supports cross-language semantic search. |
+| `get_product` | Full record for one product by ID. |
+| `search_stores` | Search/list stores by name or address. |
+| `get_store` | Full record for one store by ID. |
+| `get_stats` | Platform-wide totals. |
+
+### Write (API key)
+
+Generate a key at [partle.rubenayla.xyz/account](https://partle.rubenayla.xyz/account). Keys start with `pk_`.
+
+| Tool | Purpose |
+|------|---------|
+| `create_product` | Add a new listing. |
+| `update_product` | Edit a listing you own. |
+| `delete_product` | Remove a listing you own. |
+| `upload_product_image` | Attach an image (base64 or URL). |
+| `delete_product_image` | Remove an image from a product. |
+| `get_my_products` | List products you've created. |
+
+### Feedback
+
+| Tool | Purpose |
+|------|---------|
+| `submit_feedback` | Send freeform feedback about your integration experience. |
 
 ## Public REST API
 
-No-auth REST endpoints are also available:
+Same data, also reachable as plain HTTP for clients without MCP support:
 
 - `GET /v1/public/products?q=cerrojo&limit=10` — search products
-- `GET /v1/public/stores?limit=10` — list stores
-- `GET /v1/public/stats` — platform statistics
-- `GET /openapi.json` — full OpenAPI spec
+- `GET /v1/public/stores?q=Madrid&limit=10` — search stores
+- `GET /v1/public/stats` — platform totals
+- `POST /v1/public/feedback` — submit feedback
 
-Base URL: `https://partle.rubenayla.xyz`
+Base URL: `https://partle.rubenayla.xyz`. Rate-limited to 100 req/hour per IP.
 
-Rate limit: 100 requests/hour per IP.
+Full docs: [`/documentation/`](https://partle.rubenayla.xyz/documentation/) · OpenAPI: [`/openapi.json`](https://partle.rubenayla.xyz/openapi.json) · Discovery: [`/.well-known/mcp.json`](https://partle.rubenayla.xyz/.well-known/mcp.json).
 
 ## Example
 
-Ask an AI agent: "Where can I buy a cerrojo FAC lock near me?"
+> **You:** "Use Partle to find a drill under €50."
+>
+> **Claude:** *(calls `search_products(query="drill", max_price=50)`)*
+>
+> Returns Blackspur 13pc High Speed Drill Bit Set at €4.99 (Lenehans, IE), Flotec Drill Pump 225 GPH at €17.14 (Kooyman Megastore, NL), and a few more — each with a `partle_url` to view the listing.
 
-The agent calls `search_products(query="cerrojo FAC")` and gets back product details with store names, addresses, and prices.
+More examples in the [setup guide](https://partle.rubenayla.xyz/documentation/mcp-setup/#example-queries).
+
+## License
+
+MIT — see [LICENSE](LICENSE).
