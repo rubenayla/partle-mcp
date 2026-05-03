@@ -539,3 +539,244 @@ def get_my_products(api_key: str, limit: int = 50) -> dict:
     )
     r.raise_for_status()
     return {"result": r.json()}
+
+
+# ─── Inventory tools (auth via api_key) ───────────────────────────────────
+
+
+@mcp.tool(
+    annotations=ToolAnnotations(
+        title="Get my inventory",
+        readOnlyHint=True,
+    )
+)
+def get_my_inventory(
+    api_key: str,
+    status: Optional[str] = None,
+    product_id: Optional[int] = None,
+    project: Optional[str] = None,
+    q: Optional[str] = None,
+    limit: int = 50,
+    offset: int = 0,
+) -> dict:
+    """List the caller's personal inventory items. Requires an API key.
+
+    Use when the user asks "what do I own?", "what's on my wishlist?",
+    "what am I selling?". Pass `status` to filter; default returns all.
+
+    Args:
+        api_key: Partle API key, prefix `pk_`. Generate at
+            https://partle.rubenayla.xyz/account.
+        status: Lifecycle filter. One of: ``owned``, ``wanted``,
+            ``for_sale``, ``sold``, ``discarded``. Omit for all.
+        product_id: Filter rows linked to a specific Partle product.
+        project: Exact-match filter on project tag.
+        q: Substring search on name + notes.
+        limit: Page size 1–200, default 50.
+        offset: Pagination offset.
+
+    Returns:
+        ``{"items": [...], "count": int}`` — each item carries id,
+        status, name (or linked product), quantity, prices, etc.
+    """
+    params: dict[str, Any] = {"limit": limit, "offset": offset}
+    if status is not None:
+        params["status"] = status
+    if product_id is not None:
+        params["product_id"] = product_id
+    if project is not None:
+        params["project"] = project
+    if q is not None:
+        params["q"] = q
+    r = httpx.get(
+        f"{EXTERNAL}/inventory",
+        headers={"X-API-Key": api_key},
+        params=params,
+        timeout=HTTP_TIMEOUT,
+    )
+    r.raise_for_status()
+    items = r.json()
+    return {"items": items, "count": len(items)}
+
+
+@mcp.tool(
+    annotations=ToolAnnotations(
+        title="Add inventory item",
+        readOnlyHint=False,
+        destructiveHint=False,
+        idempotentHint=False,
+    )
+)
+def add_inventory_item(
+    api_key: str,
+    name: Optional[str] = None,
+    product_id: Optional[int] = None,
+    status: str = "owned",
+    quantity: float = 1,
+    notes: Optional[str] = None,
+    acquisition_price: Optional[float] = None,
+    acquisition_currency: Optional[str] = None,
+    purchased_at: Optional[str] = None,
+    asking_price: Optional[float] = None,
+    asking_currency: Optional[str] = None,
+    condition: Optional[str] = None,
+    external_link: Optional[str] = None,
+    project: Optional[str] = None,
+) -> dict:
+    """Add an item to the caller's personal inventory. Requires an API key.
+
+    One creation tool covers all lifecycle states — set ``status`` to
+    match the user's intent: "I bought" → ``owned``, "I want" →
+    ``wanted``, "I'm selling" → ``for_sale``. Either ``product_id`` or
+    ``name`` must be set. **Not idempotent**.
+
+    Args:
+        api_key: Partle API key (prefix `pk_`).
+        name: Freeform name for items not yet linked to a Partle product.
+        product_id: Link to a canonical Partle product.
+        status: Lifecycle. Default ``owned``.
+        quantity: How many. Fractional ok. Default 1.
+        notes: Freeform multi-line text — the dumping ground for anything
+            not modeled as a column: extra URLs, comments, where stored,
+            condition narrative, purpose, source, history, log entries.
+            Markdown is fine. **Put extra URLs here, not in another field.**
+        acquisition_price: What you paid.
+        acquisition_currency: Currency of acquisition_price.
+        purchased_at: ISO date (YYYY-MM-DD).
+        asking_price: For status=for_sale.
+        asking_currency: Currency of asking_price.
+        condition: Free string — typical: ``new``, ``like_new``,
+            ``good``, ``fair``, ``poor``.
+        external_link: **Primary** click-through URL only (source listing,
+            vendor page, manufacturer page). Exactly one. Additional URLs
+            go in ``notes`` as markdown links.
+        project: Tag for grouping.
+
+    Returns:
+        The created inventory row.
+    """
+    payload: dict[str, Any] = {"status": status, "quantity": quantity}
+    for k, v in {
+        "name": name, "product_id": product_id, "notes": notes,
+        "acquisition_price": acquisition_price,
+        "acquisition_currency": acquisition_currency,
+        "purchased_at": purchased_at,
+        "asking_price": asking_price, "asking_currency": asking_currency,
+        "condition": condition, "external_link": external_link,
+        "project": project,
+    }.items():
+        if v is not None:
+            payload[k] = v
+    return _post_external("/inventory", api_key, payload)
+
+
+@mcp.tool(
+    annotations=ToolAnnotations(
+        title="Update inventory item",
+        readOnlyHint=False,
+        destructiveHint=False,
+        idempotentHint=True,
+    )
+)
+def update_inventory_item(
+    api_key: str,
+    item_id: int,
+    name: Optional[str] = None,
+    product_id: Optional[int] = None,
+    status: Optional[str] = None,
+    quantity: Optional[float] = None,
+    notes: Optional[str] = None,
+    acquisition_price: Optional[float] = None,
+    acquisition_currency: Optional[str] = None,
+    purchased_at: Optional[str] = None,
+    asking_price: Optional[float] = None,
+    asking_currency: Optional[str] = None,
+    condition: Optional[str] = None,
+    external_link: Optional[str] = None,
+    project: Optional[str] = None,
+) -> dict:
+    """Patch an inventory item. Only provided fields change. Idempotent.
+
+    Caller must own the item (404 otherwise — the API doesn't leak
+    existence). For lifecycle changes, see `mark_for_sale` and
+    `mark_sold` for ergonomic wrappers.
+    """
+    payload: dict[str, Any] = {}
+    for k, v in {
+        "name": name, "product_id": product_id, "status": status,
+        "quantity": quantity, "notes": notes,
+        "acquisition_price": acquisition_price,
+        "acquisition_currency": acquisition_currency,
+        "purchased_at": purchased_at,
+        "asking_price": asking_price, "asking_currency": asking_currency,
+        "condition": condition, "external_link": external_link,
+        "project": project,
+    }.items():
+        if v is not None:
+            payload[k] = v
+    return _patch_external(f"/inventory/{item_id}", api_key, payload)
+
+
+@mcp.tool(
+    annotations=ToolAnnotations(
+        title="Delete inventory item",
+        readOnlyHint=False,
+        destructiveHint=True,
+        idempotentHint=True,
+    )
+)
+def delete_inventory_item(api_key: str, item_id: int) -> dict:
+    """Permanently delete an inventory row. Caller must own it.
+
+    Args:
+        api_key: Partle API key (prefix `pk_`).
+        item_id: ID of the row to delete.
+
+    Returns:
+        ``{"deleted": True, "id": item_id}`` on success.
+    """
+    _delete_external(f"/inventory/{item_id}", api_key)
+    return {"deleted": True, "id": item_id}
+
+
+@mcp.tool(
+    annotations=ToolAnnotations(
+        title="Mark inventory item for sale",
+        readOnlyHint=False,
+        destructiveHint=False,
+        idempotentHint=True,
+    )
+)
+def mark_for_sale(
+    api_key: str,
+    item_id: int,
+    asking_price: float,
+    asking_currency: str = "€",
+    condition: Optional[str] = None,
+) -> dict:
+    """Set status=for_sale and listing fields atomically.
+
+    Convenience wrapper for "list X for sale at Y€". Caller must own
+    the item.
+    """
+    payload: dict[str, Any] = {
+        "status": "for_sale",
+        "asking_price": asking_price,
+        "asking_currency": asking_currency,
+    }
+    if condition is not None:
+        payload["condition"] = condition
+    return _patch_external(f"/inventory/{item_id}", api_key, payload)
+
+
+@mcp.tool(
+    annotations=ToolAnnotations(
+        title="Mark inventory item sold",
+        readOnlyHint=False,
+        destructiveHint=False,
+        idempotentHint=True,
+    )
+)
+def mark_sold(api_key: str, item_id: int) -> dict:
+    """Mark an inventory item as sold (status=sold). Caller must own it."""
+    return _patch_external(f"/inventory/{item_id}", api_key, {"status": "sold"})
