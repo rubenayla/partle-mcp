@@ -621,6 +621,7 @@ def add_inventory_item(
     asking_currency: Optional[str] = None,
     condition: Optional[str] = None,
     external_link: Optional[str] = None,
+    external_id: Optional[str] = None,
     project: Optional[str] = None,
 ) -> dict:
     """Add an item to the caller's personal inventory. Requires an API key.
@@ -650,6 +651,11 @@ def add_inventory_item(
         external_link: **Primary** click-through URL only (source listing,
             vendor page, manufacturer page). Exactly one. Additional URLs
             go in ``notes`` as markdown links.
+        external_id: Stable identifier from the source system, used as a
+            **dedup key**. Per-user unique when set — same external_id
+            can't appear twice for one user. Format is up to you (e.g.
+            ``aliexpress:1005004714348221``, ``amazon:order/.../line/1``,
+            content hash). Leave null for handwritten items.
         project: Tag for grouping.
 
     Returns:
@@ -663,7 +669,7 @@ def add_inventory_item(
         "purchased_at": purchased_at,
         "asking_price": asking_price, "asking_currency": asking_currency,
         "condition": condition, "external_link": external_link,
-        "project": project,
+        "external_id": external_id, "project": project,
     }.items():
         if v is not None:
             payload[k] = v
@@ -693,6 +699,7 @@ def update_inventory_item(
     asking_currency: Optional[str] = None,
     condition: Optional[str] = None,
     external_link: Optional[str] = None,
+    external_id: Optional[str] = None,
     project: Optional[str] = None,
 ) -> dict:
     """Patch an inventory item. Only provided fields change. Idempotent.
@@ -710,7 +717,7 @@ def update_inventory_item(
         "purchased_at": purchased_at,
         "asking_price": asking_price, "asking_currency": asking_currency,
         "condition": condition, "external_link": external_link,
-        "project": project,
+        "external_id": external_id, "project": project,
     }.items():
         if v is not None:
             payload[k] = v

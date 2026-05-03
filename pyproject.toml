@@ -1,6 +1,6 @@
 [project]
 name = "partle-mcp"
-version = "0.2.0"
+version = "0.3.0"
 description = "MCP server for the Partle local marketplace — find products in physical stores near you. Stdio mode for installable use; remote HTTP mode also available at https://partle.rubenayla.xyz/mcp/."
 readme = "README.md"
 license = { text = "MIT" }
