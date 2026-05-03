@@ -62,9 +62,12 @@ The stdio package proxies to the public REST API at `https://partle.rubenayla.xy
 | `get_store` | Full record for one store by ID. |
 | `get_stats` | Platform-wide totals. |
 
-### Write (API key)
+### Write (authenticated)
 
-Generate a key at [partle.rubenayla.xyz/account](https://partle.rubenayla.xyz/account). Keys start with `pk_`.
+Two ways to authenticate, in preference order:
+
+1. **OAuth (recommended)** — when you add Partle as a custom connector in claude.ai or any MCP client that supports OAuth, the client walks you through a one-click consent screen and attaches a bearer token automatically. Scopes: `products:read` (gates `get_my_products`), `products:write` (gates the rest). Revoke at [/account](https://partle.rubenayla.xyz/account) → **Connected apps**. RFC 9728 metadata at [`/.well-known/oauth-protected-resource`](https://partle.rubenayla.xyz/.well-known/oauth-protected-resource); RFC 7591 dynamic client registration at `/oauth/register`.
+2. **API key (fallback)** — pass an `api_key` parameter to any write tool. Generate at [/account](https://partle.rubenayla.xyz/account) → **API Keys**. Use this when your client doesn't support OAuth (raw scripts, programmatic agents).
 
 | Tool | Purpose |
 |------|---------|
