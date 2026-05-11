@@ -109,4 +109,4 @@ More examples in the [setup guide](https://partle.rubenayla.xyz/documentation/mc
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+Apache-2.0 — see [LICENSE](LICENSE).

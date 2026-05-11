@@ -3,14 +3,14 @@ name = "partle-mcp"
 version = "0.3.0"
 description = "MCP server for the Partle local marketplace — find products in physical stores near you. Stdio mode for installable use; remote HTTP mode also available at https://partle.rubenayla.xyz/mcp/."
 readme = "README.md"
-license = { text = "MIT" }
+license = { text = "Apache-2.0" }
 authors = [
     { name = "Rubén Jiménez Mejías", email = "ruben.jimenezmejias@gmail.com" },
 ]
 requires-python = ">=3.11"
 keywords = ["mcp", "partle", "marketplace", "local-search", "products", "stores"]
 classifiers = [
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
