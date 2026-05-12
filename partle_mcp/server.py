@@ -313,6 +313,7 @@ def create_product(
     currency: Optional[str] = "€",
     url: Optional[str] = None,
     store_id: Optional[int] = None,
+    verified: bool = True,
 ) -> dict:
     """Create a new product listing on Partle. Requires an API key.
 
@@ -332,12 +333,21 @@ def create_product(
         url: Link to the merchant's product page. Optional but recommended.
         store_id: ID of the store this product belongs to. Omit for a
             personal listing not tied to any store.
+        verified: Whether the responsible human has confirmed this listing
+            is really for sale at this price. Default `True` covers: a
+            human is calling you, you (the AI) are acting as the seller
+            yourself, or you are mirroring a listing already public on the
+            seller's own website. Set `False` **only** when you are
+            proposing a listing on behalf of a human who has not explicitly
+            confirmed it — the listing then renders with an "Unverified"
+            badge and is omitted from schema.org/Offer JSON-LD so search
+            engines don't treat it as a confirmed offer.
 
     Returns:
         The created product record including its new `id` and canonical
         `partle_url`. Share `partle_url` with the user.
     """
-    payload: dict[str, Any] = {"name": name}
+    payload: dict[str, Any] = {"name": name, "verified": verified}
     if description is not None:
         payload["description"] = description
     if price is not None:
@@ -367,6 +377,7 @@ def update_product(
     price: Optional[float] = None,
     currency: Optional[str] = None,
     url: Optional[str] = None,
+    verified: Optional[bool] = None,
 ) -> dict:
     """Update fields on an existing product. Requires an API key.
 
@@ -386,6 +397,11 @@ def update_product(
         price: New price in whole currency units (e.g. 15.99 = €15.99).
         currency: New currency symbol.
         url: New merchant URL.
+        verified: Flip the confirmation state. Pass `True` to confirm an
+            AI-proposed listing (removes the "Unverified" badge and adds
+            the schema.org/Offer JSON-LD). Pass `False` to revert. Omit
+            to leave unchanged. See `create_product` for the full
+            semantics.
 
     Returns:
         The updated product record (full, not just the changed fields).
@@ -401,6 +417,8 @@ def update_product(
         payload["currency"] = currency
     if url is not None:
         payload["url"] = url
+    if verified is not None:
+        payload["verified"] = verified
     return _patch_external(f"/products/{product_id}", api_key, payload)
 
 
