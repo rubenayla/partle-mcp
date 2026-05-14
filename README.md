@@ -50,7 +50,7 @@ The stdio package proxies to the public REST API at `https://partle.rubenayla.xy
 }
 ```
 
-## Tools (12 total)
+## Tools (20 total)
 
 ### Read (no auth)
 
@@ -61,22 +61,44 @@ The stdio package proxies to the public REST API at `https://partle.rubenayla.xy
 | `search_stores` | Search/list stores by name or address. |
 | `get_store` | Full record for one store by ID. |
 | `get_stats` | Platform-wide totals. |
+| `search_wanted` | Browse public **buy requests** at `/wanted` — things people are looking to buy but haven't found. Cross-reference against `search_products` to offer matches. |
 
 ### Write (authenticated)
 
 Two ways to authenticate, in preference order:
 
-1. **OAuth (recommended)** — when you add Partle as a custom connector in claude.ai or any MCP client that supports OAuth, the client walks you through a one-click consent screen and attaches a bearer token automatically. Scopes: `products:read` (gates `get_my_products`), `products:write` (gates the rest). Revoke at [/account](https://partle.rubenayla.xyz/account) → **Connected apps**. RFC 9728 metadata at [`/.well-known/oauth-protected-resource`](https://partle.rubenayla.xyz/.well-known/oauth-protected-resource); RFC 7591 dynamic client registration at `/oauth/register`.
+1. **OAuth (recommended)** — when you add Partle as a custom connector in claude.ai or any MCP client that supports OAuth, the client walks you through a one-click consent screen and attaches a bearer token automatically. Scopes: `products:read`, `products:write`, `inventory:read`, `inventory:write`. Revoke at [/account](https://partle.rubenayla.xyz/account) → **Connected apps**. RFC 9728 metadata at [`/.well-known/oauth-protected-resource`](https://partle.rubenayla.xyz/.well-known/oauth-protected-resource); RFC 7591 dynamic client registration at `/oauth/register`.
 2. **API key (fallback)** — pass an `api_key` parameter to any write tool. Generate at [/account](https://partle.rubenayla.xyz/account) → **API Keys**. Use this when your client doesn't support OAuth (raw scripts, programmatic agents).
+
+**Products** — public catalog listings.
 
 | Tool | Purpose |
 |------|---------|
-| `create_product` | Add a new listing. |
+| `create_product` | Add a new listing. Set `verified=false` when an AI is proposing on behalf of an unconfirmed human. |
 | `update_product` | Edit a listing you own. |
 | `delete_product` | Remove a listing you own. |
 | `upload_product_image` | Attach an image (base64 or URL). |
 | `delete_product_image` | Remove an image from a product. |
 | `get_my_products` | List products you've created. |
+
+> The remote HTTP server also offers `get_upload_url` (re-fetches a signed upload URL for an existing product). Not exposed in this stdio package — use the remote server if you need it.
+
+**Inventory** — private workshop tracking (owned / wanted / for_sale / sold / discarded). Private to the owner; **does not** appear on the public `/wanted` feed.
+
+| Tool | Purpose |
+|------|---------|
+| `get_my_inventory` | List your inventory items. Filterable by status, project, free text. |
+| `add_inventory_item` | Add a row in any lifecycle state. |
+| `update_inventory_item` | Patch any field. |
+| `delete_inventory_item` | Permanently remove a row. |
+| `mark_for_sale` | Convenience: flip an `owned` item to `for_sale` and set an asking price. |
+| `mark_sold` | Convenience: flip a `for_sale` item to `sold`. |
+
+**Buy requests** — public demand-side posts on `/wanted`. Independent of personal inventory.
+
+| Tool | Purpose |
+|------|---------|
+| `create_buy_request` | Post a public buy request (title, description, quantity, optional `max_price` and `contact`). |
 
 ### Feedback
 
@@ -90,6 +112,7 @@ Same data, also reachable as plain HTTP for clients without MCP support:
 
 - `GET /v1/public/products?q=cerrojo&limit=10` — search products
 - `GET /v1/public/stores?q=Madrid&limit=10` — search stores
+- `GET /v1/public/wanted?q=bolt&limit=10` — list open public buy requests
 - `GET /v1/public/stats` — platform totals
 - `POST /v1/public/feedback` — submit feedback
 

@@ -2,7 +2,7 @@
 
 This module is the canonical Python package for use with Glama's directory
 scanner and any MCP client that prefers a stdio-installable server. It exposes
-the same 12 tools as the remote HTTP MCP at ``https://partle.rubenayla.xyz/mcp/``
+the same 21 tools as the remote HTTP MCP at ``https://partle.rubenayla.xyz/mcp/``
 but talks to the public REST API (``/v1/public`` for reads, ``/v1/external`` for
 writes) so it can run anywhere without database access.
 
@@ -255,6 +255,54 @@ def get_stats() -> dict:
         "api_version": str, "description": str}``.
     """
     return _get("/stats")
+
+
+@mcp.tool(
+    annotations=ToolAnnotations(
+        title="Search buy requests (public demand feed)",
+        readOnlyHint=True,
+        openWorldHint=True,
+    )
+)
+def search_wanted(
+    query: Optional[str] = None,
+    limit: int = 20,
+    offset: int = 0,
+) -> list[dict]:
+    """Browse public buy requests — what users are looking to buy but
+    haven't found through normal supply.
+
+    The demand side of Partle. Use this when an agent wants to **offer
+    matches** (cross-reference open requests against `search_products`
+    and surface hits) or just survey unmet demand. Every result is a
+    public posting — users put these up specifically so suppliers can
+    reach them.
+
+    Buy requests are independent of personal inventory (which is private):
+    these are sales-facing ads, not workshop tracking notes.
+
+    Read-only. No authentication. Rate-limited 100 req/hour per IP.
+
+    Args:
+        query: Free-text filter over title + description (case-insensitive
+            substring). Omit to list everything, newest first.
+        limit: Max results (1–100, default 20).
+        offset: Pagination offset.
+
+    Returns:
+        A list of open buy requests. Each includes ``id``, ``title``,
+        ``description``, ``quantity``, ``max_price`` + ``currency`` (if
+        the poster set a ceiling), ``contact`` (if they left an
+        email/phone/handle), ``reference_url``, ``posted_by`` (display
+        name), and ``created_at``.
+
+        If the poster left a ``contact`` value, that's how a supplier
+        should respond — Partle doesn't broker the conversation.
+    """
+    params: dict = {"limit": int(limit), "offset": int(offset)}
+    if query:
+        params["q"] = query
+    return _get("/wanted", params=params)
 
 
 # ─── feedback (write, no auth) ────────────────────────────────────────────
@@ -805,3 +853,70 @@ def mark_for_sale(
 def mark_sold(api_key: str, item_id: int) -> dict:
     """Mark an inventory item as sold (status=sold). Caller must own it."""
     return _patch_external(f"/inventory/{item_id}", api_key, {"status": "sold"})
+
+
+# ─── Buy requests (public demand feed; auth via api_key) ──────────────────
+
+
+@mcp.tool(
+    annotations=ToolAnnotations(
+        title="Create buy request",
+        readOnlyHint=False,
+        destructiveHint=False,
+        idempotentHint=False,
+    )
+)
+def create_buy_request(
+    api_key: str,
+    title: str,
+    description: Optional[str] = None,
+    quantity: int = 1,
+    max_price: Optional[float] = None,
+    currency: Optional[str] = "€",
+    contact: Optional[str] = None,
+    reference_url: Optional[str] = None,
+    product_id: Optional[int] = None,
+) -> dict:
+    """Post a public buy request — an ad asking suppliers to reach out.
+
+    Use when the user wants others to know they're looking to buy
+    something. **Independent of personal inventory** — inventory is the
+    user's private workshop tracking; a buy request is a sales-facing
+    ad on the public demand feed at https://partle.rubenayla.xyz/wanted .
+
+    Not idempotent — each call creates a new public post.
+
+    Args:
+        api_key: Partle API key (`pk_` prefix).
+        title: Short scannable headline ("Looking for X"). Required.
+        description: Markdown long-form — specs, constraints, delivery
+            preference. The supplier reads this to decide whether they
+            can fulfil.
+        quantity: How many units the poster wants. Default 1.
+        max_price: Optional ceiling per unit.
+        currency: Currency for max_price (default €).
+        contact: Free-form contact (email/phone/Telegram/etc.) shown
+            publicly. Optional but strongly recommended — without it
+            suppliers have no way to reach the poster.
+        reference_url: Link to a sample, datasheet, manufacturer page.
+        product_id: Link to a canonical Partle product if asking for a
+            specific known SKU.
+
+    Returns:
+        The newly-created buy request including its ``id`` and the
+        public URL where it shows up.
+    """
+    payload: dict[str, Any] = {"title": title, "quantity": int(quantity)}
+    if description is not None:
+        payload["description"] = description
+    if max_price is not None:
+        payload["max_price"] = max_price
+    if currency is not None:
+        payload["currency"] = currency
+    if contact is not None:
+        payload["contact"] = contact
+    if reference_url is not None:
+        payload["reference_url"] = reference_url
+    if product_id is not None:
+        payload["product_id"] = product_id
+    return _post_external("/buy_requests", api_key, payload)
