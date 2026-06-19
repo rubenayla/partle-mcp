@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/rubenayla-partle-mcp-badge.png)](https://mseep.ai/app/rubenayla-partle-mcp)
+
 # Partle Marketplace MCP Server
 
 [Model Context Protocol](https://modelcontextprotocol.io/) server for the Partle local marketplace — find products in physical stores near you, ask an AI to add a listing for you, all without leaving your assistant.
