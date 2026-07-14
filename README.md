@@ -1,6 +1,6 @@
 # Partle Marketplace MCP Server
 
-[Model Context Protocol](https://modelcontextprotocol.io/) server for the Partle local marketplace — find products in physical stores near you, ask an AI to add a listing for you, all without leaving your assistant.
+[Model Context Protocol](https://modelcontextprotocol.io/) server for the Partle marketplace — let your AI shop here: search products and stores, get prices and purchase links, or ask it to add a listing for you, all without leaving your assistant.
 
 **130,000+ products** across **~16,000 stores**. Reads need no auth. Writes need a `pk_…` API key.
 

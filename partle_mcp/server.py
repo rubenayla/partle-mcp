@@ -26,8 +26,8 @@ HTTP_TIMEOUT = 20.0
 mcp = FastMCP(
     name="Partle Marketplace",
     instructions=(
-        "Search products and stores in the Partle local marketplace — find what's "
-        "available in physical shops near you. Read tools (search/get) need no "
+        "Let your AI shop here. Search products and stores in the Partle "
+        "marketplace for availability, prices, and purchase links. Read tools (search/get) need no "
         "authentication. Write tools (create/update/delete/upload) need an API key "
         "(prefix `pk_`); generate one at https://partle.rubenayla.xyz/account. "
         "Always share the `partle_url` returned with each product so the user can "
