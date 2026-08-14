@@ -90,7 +90,8 @@ def _delete_external(path: str, api_key: str) -> None:
     annotations=ToolAnnotations(
         title="Search products",
         readOnlyHint=True,
-        openWorldHint=True,
+        openWorldHint=False,
+        destructiveHint=False,
     )
 )
 def search_products(
@@ -157,7 +158,12 @@ def search_products(
 
 
 @mcp.tool(
-    annotations=ToolAnnotations(title="Get product details", readOnlyHint=True)
+    annotations=ToolAnnotations(
+        title="Get product details",
+        readOnlyHint=True,
+        openWorldHint=False,
+        destructiveHint=False,
+    )
 )
 def get_product(product_id: int) -> dict:
     """Get the full record for a single product by its numeric ID.
@@ -185,7 +191,8 @@ def get_product(product_id: int) -> dict:
     annotations=ToolAnnotations(
         title="Search stores",
         readOnlyHint=True,
-        openWorldHint=True,
+        openWorldHint=False,
+        destructiveHint=False,
     )
 )
 def search_stores(query: Optional[str] = None, limit: int = 20) -> dict:
@@ -215,7 +222,12 @@ def search_stores(query: Optional[str] = None, limit: int = 20) -> dict:
 
 
 @mcp.tool(
-    annotations=ToolAnnotations(title="Get store details", readOnlyHint=True)
+    annotations=ToolAnnotations(
+        title="Get store details",
+        readOnlyHint=True,
+        openWorldHint=False,
+        destructiveHint=False,
+    )
 )
 def get_store(store_id: int) -> dict:
     """Get the full record for a single store by its numeric ID.
@@ -238,7 +250,12 @@ def get_store(store_id: int) -> dict:
 
 
 @mcp.tool(
-    annotations=ToolAnnotations(title="Get platform stats", readOnlyHint=True)
+    annotations=ToolAnnotations(
+        title="Get platform stats",
+        readOnlyHint=True,
+        openWorldHint=False,
+        destructiveHint=False,
+    )
 )
 def get_stats() -> dict:
     """Get top-level Partle platform statistics.
@@ -261,7 +278,8 @@ def get_stats() -> dict:
     annotations=ToolAnnotations(
         title="Search buy requests (public demand feed)",
         readOnlyHint=True,
-        openWorldHint=True,
+        openWorldHint=False,
+        destructiveHint=False,
     )
 )
 def search_wanted(
@@ -314,6 +332,7 @@ def search_wanted(
         readOnlyHint=False,
         destructiveHint=False,
         idempotentHint=False,
+        openWorldHint=False,
     )
 )
 def submit_feedback(feedback: str) -> dict:
@@ -351,6 +370,7 @@ def submit_feedback(feedback: str) -> dict:
         readOnlyHint=False,
         destructiveHint=False,
         idempotentHint=False,
+        openWorldHint=True,
     )
 )
 def create_product(
@@ -415,6 +435,7 @@ def create_product(
         readOnlyHint=False,
         destructiveHint=False,
         idempotentHint=True,
+        openWorldHint=True,
     )
 )
 def update_product(
@@ -476,6 +497,7 @@ def update_product(
         readOnlyHint=False,
         destructiveHint=True,
         idempotentHint=True,
+        openWorldHint=True,
     )
 )
 def delete_product(api_key: str, product_id: int) -> dict:
@@ -503,8 +525,9 @@ def delete_product(api_key: str, product_id: int) -> dict:
     annotations=ToolAnnotations(
         title="Upload product image",
         readOnlyHint=False,
-        destructiveHint=True,
+        destructiveHint=False,
         idempotentHint=True,
+        openWorldHint=True,
     )
 )
 def upload_product_image(
@@ -554,6 +577,7 @@ def upload_product_image(
         readOnlyHint=False,
         destructiveHint=True,
         idempotentHint=True,
+        openWorldHint=True,
     )
 )
 def delete_product_image(api_key: str, product_id: int, image_id: int) -> dict:
@@ -578,7 +602,12 @@ def delete_product_image(api_key: str, product_id: int, image_id: int) -> dict:
 
 
 @mcp.tool(
-    annotations=ToolAnnotations(title="List my products", readOnlyHint=True)
+    annotations=ToolAnnotations(
+        title="List my products",
+        readOnlyHint=True,
+        openWorldHint=False,
+        destructiveHint=False,
+    )
 )
 def get_my_products(api_key: str, limit: int = 50) -> dict:
     """List products created by the API key's owner. Requires an API key.
@@ -614,6 +643,8 @@ def get_my_products(api_key: str, limit: int = 50) -> dict:
     annotations=ToolAnnotations(
         title="Get my inventory",
         readOnlyHint=True,
+        openWorldHint=False,
+        destructiveHint=False,
     )
 )
 def get_my_inventory(
@@ -671,6 +702,7 @@ def get_my_inventory(
         readOnlyHint=False,
         destructiveHint=False,
         idempotentHint=False,
+        openWorldHint=False,
     )
 )
 def add_inventory_item(
@@ -748,6 +780,7 @@ def add_inventory_item(
         readOnlyHint=False,
         destructiveHint=False,
         idempotentHint=True,
+        openWorldHint=False,
     )
 )
 def update_inventory_item(
@@ -796,6 +829,7 @@ def update_inventory_item(
         readOnlyHint=False,
         destructiveHint=True,
         idempotentHint=True,
+        openWorldHint=False,
     )
 )
 def delete_inventory_item(api_key: str, item_id: int) -> dict:
@@ -818,6 +852,7 @@ def delete_inventory_item(api_key: str, item_id: int) -> dict:
         readOnlyHint=False,
         destructiveHint=False,
         idempotentHint=True,
+        openWorldHint=False,
     )
 )
 def mark_for_sale(
@@ -848,6 +883,7 @@ def mark_for_sale(
         readOnlyHint=False,
         destructiveHint=False,
         idempotentHint=True,
+        openWorldHint=False,
     )
 )
 def mark_sold(api_key: str, item_id: int) -> dict:
@@ -864,6 +900,7 @@ def mark_sold(api_key: str, item_id: int) -> dict:
         readOnlyHint=False,
         destructiveHint=False,
         idempotentHint=False,
+        openWorldHint=True,
     )
 )
 def create_buy_request(

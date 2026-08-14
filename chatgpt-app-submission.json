@@ -1,0 +1,240 @@
+{
+  "$schema": "https://developers.openai.com/apps-sdk/schemas/chatgpt-app-submission.v1.json",
+  "schema_version": 1,
+  "app_info": {
+    "display_name": "Partle Marketplace",
+    "subtitle": "Find products and stores",
+    "description": "Partle helps users find products and physical stores, compare availability and prices, manage their personal inventory, and publish or maintain their own marketplace listings.",
+    "category": "SHOPPING"
+  },
+  "tools": {
+    "search_products": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Only searches and returns matching products without changing catalog data.",
+        "open_world_justification": "Reads Partle catalog data but does not change public internet state or an external system.",
+        "destructive_justification": "Does not delete, overwrite, revoke access, or perform an irreversible action."
+      }
+    },
+    "get_product": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Only retrieves one product record without changing data.",
+        "open_world_justification": "Reads a Partle product record but does not change public internet state or an external system.",
+        "destructive_justification": "Does not delete, overwrite, revoke access, or perform an irreversible action."
+      }
+    },
+    "search_stores": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Only searches and returns matching stores without changing store data.",
+        "open_world_justification": "Reads Partle store data but does not change public internet state or an external system.",
+        "destructive_justification": "Does not delete, overwrite, revoke access, or perform an irreversible action."
+      }
+    },
+    "get_store": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Only retrieves one store record without changing data.",
+        "open_world_justification": "Reads a Partle store record but does not change public internet state or an external system.",
+        "destructive_justification": "Does not delete, overwrite, revoke access, or perform an irreversible action."
+      }
+    },
+    "get_stats": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Only retrieves aggregate Partle marketplace statistics.",
+        "open_world_justification": "Reads aggregate Partle data but does not change public internet state or an external system.",
+        "destructive_justification": "Does not delete, overwrite, revoke access, or perform an irreversible action."
+      }
+    },
+    "search_wanted": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Only searches public buy requests without creating or changing posts.",
+        "open_world_justification": "Reads Partle demand-feed data but does not change public internet state or an external system.",
+        "destructive_justification": "Does not delete, overwrite, revoke access, or perform an irreversible action."
+      }
+    },
+    "submit_feedback": {
+      "annotations": {"readOnlyHint": false, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Creates a feedback record, so it changes Partle data.",
+        "open_world_justification": "Sends feedback to Partle's own feedback system without publishing it to public internet state.",
+        "destructive_justification": "Adds feedback and does not delete, overwrite, revoke access, or perform an irreversible action."
+      }
+    },
+    "create_product": {
+      "annotations": {"readOnlyHint": false, "openWorldHint": true, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Creates a new marketplace product listing and changes Partle data.",
+        "open_world_justification": "Publishes a product listing to Partle's public marketplace.",
+        "destructive_justification": "Creates a listing but does not delete, overwrite, revoke access, or perform an irreversible action."
+      }
+    },
+    "update_product": {
+      "annotations": {"readOnlyHint": false, "openWorldHint": true, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Updates fields on an owned marketplace listing and changes Partle data.",
+        "open_world_justification": "Changes information visible on Partle's public marketplace.",
+        "destructive_justification": "Updates an owned listing but does not delete, revoke access, or perform an irreversible action."
+      }
+    },
+    "delete_product": {
+      "annotations": {"readOnlyHint": false, "openWorldHint": true, "destructiveHint": true},
+      "justifications": {
+        "read_only_justification": "Permanently deletes an owned product listing and changes Partle data.",
+        "open_world_justification": "Removes a listing from Partle's public marketplace.",
+        "destructive_justification": "Permanently deletes the product and all its images; the implementation has no trash or recovery step."
+      }
+    },
+    "upload_product_image": {
+      "annotations": {"readOnlyHint": false, "openWorldHint": true, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Adds an image to an owned product listing and changes Partle data.",
+        "open_world_justification": "Adds an image that becomes visible on Partle's public marketplace listing.",
+        "destructive_justification": "Adds an image without deleting or overwriting an existing image."
+      }
+    },
+    "delete_product_image": {
+      "annotations": {"readOnlyHint": false, "openWorldHint": true, "destructiveHint": true},
+      "justifications": {
+        "read_only_justification": "Deletes an image from an owned product listing and changes Partle data.",
+        "open_world_justification": "Removes an image from a listing visible on Partle's public marketplace.",
+        "destructive_justification": "Permanently removes the selected product image and its stored file."
+      }
+    },
+    "get_my_products": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Only lists products owned by the caller without changing them.",
+        "open_world_justification": "Reads the caller's Partle listings but does not change public internet state or an external system.",
+        "destructive_justification": "Does not delete, overwrite, revoke access, or perform an irreversible action."
+      }
+    },
+    "get_my_inventory": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Only lists the caller's private inventory without changing it.",
+        "open_world_justification": "Reads private Partle inventory data and does not change public internet state or an external system.",
+        "destructive_justification": "Does not delete, overwrite, revoke access, or perform an irreversible action."
+      }
+    },
+    "add_inventory_item": {
+      "annotations": {"readOnlyHint": false, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Creates a private inventory item and changes the caller's Partle data.",
+        "open_world_justification": "Changes private inventory data and does not publish to public internet state.",
+        "destructive_justification": "Creates a private inventory row but does not delete, overwrite, revoke access, or perform an irreversible action."
+      }
+    },
+    "update_inventory_item": {
+      "annotations": {"readOnlyHint": false, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Updates a private inventory item and changes the caller's Partle data.",
+        "open_world_justification": "Changes private inventory data and does not publish to public internet state.",
+        "destructive_justification": "Edits a private inventory row but does not delete, revoke access, or perform an irreversible action."
+      }
+    },
+    "delete_inventory_item": {
+      "annotations": {"readOnlyHint": false, "openWorldHint": false, "destructiveHint": true},
+      "justifications": {
+        "read_only_justification": "Deletes a private inventory item and changes the caller's Partle data.",
+        "open_world_justification": "Changes private inventory data and does not publish to public internet state.",
+        "destructive_justification": "Permanently removes the selected inventory row."
+      }
+    },
+    "mark_for_sale": {
+      "annotations": {"readOnlyHint": false, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Changes a private inventory item's lifecycle and sale fields.",
+        "open_world_justification": "Changes private inventory data and does not publish a public listing by itself.",
+        "destructive_justification": "Changes status and price fields but does not delete, revoke access, or perform an irreversible action."
+      }
+    },
+    "mark_sold": {
+      "annotations": {"readOnlyHint": false, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Changes a private inventory item's lifecycle status.",
+        "open_world_justification": "Changes private inventory data and does not publish to public internet state.",
+        "destructive_justification": "Marks an item sold but does not delete, revoke access, or perform an irreversible action."
+      }
+    },
+    "create_buy_request": {
+      "annotations": {"readOnlyHint": false, "openWorldHint": true, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Creates a buy-request post and changes Partle data.",
+        "open_world_justification": "Publishes a buy request on Partle's public demand feed for suppliers to see.",
+        "destructive_justification": "Creates a public request but does not delete, overwrite, revoke access, or perform an irreversible action."
+      }
+    }
+  },
+  "test_cases": [
+    {
+      "description": "Find products matching a request with a price limit.",
+      "user_prompt": "Find me a cordless drill under €100 and show the Partle links.",
+      "file_attachment_urls": null,
+      "tools_triggered": "search_products",
+      "expected_output": "Returns matching products with prices, stores, and canonical Partle links.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Find stores in a named area.",
+      "user_prompt": "What hardware stores does Partle know about in Madrid?",
+      "file_attachment_urls": null,
+      "tools_triggered": "search_stores",
+      "expected_output": "Returns matching stores with names, addresses, and available store details.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Inspect one product after finding it.",
+      "user_prompt": "Show me the full details for Partle product 123.",
+      "file_attachment_urls": null,
+      "tools_triggered": "get_product",
+      "expected_output": "Returns the product record with its details, images, and canonical Partle link.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Review the caller's private inventory.",
+      "user_prompt": "Show me the items in my Partle inventory that are for sale.",
+      "file_attachment_urls": null,
+      "tools_triggered": "get_my_inventory",
+      "expected_output": "Returns the caller's matching private inventory items without exposing unrelated users' data.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Create a public buy request when explicitly asked.",
+      "user_prompt": "Post a Partle buy request for a used 1/2-inch torque wrench, maximum €60.",
+      "file_attachment_urls": null,
+      "tools_triggered": "create_buy_request",
+      "expected_output": "Creates one public buy request and reports the resulting record for review.",
+      "expected_output_url": null
+    }
+  ],
+  "negative_test_cases": [
+    {
+      "description": "Do not trigger for unrelated calendar requests.",
+      "user_prompt": "What meetings do I have tomorrow?",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked because the request is outside its supported marketplace workflows.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not trigger for general product advice with no Partle lookup request.",
+      "user_prompt": "Which type of drill bit is best for porcelain tile?",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked because the user asked for general advice rather than a Partle search.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not trigger for unrelated file editing.",
+      "user_prompt": "Rewrite this paragraph in a more formal tone.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked because the request does not involve Partle products, stores, inventory, or listings.",
+      "expected_output_url": null
+    }
+  ]
+}
