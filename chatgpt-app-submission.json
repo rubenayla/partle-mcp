@@ -112,6 +112,14 @@
         "destructive_justification": "Does not delete, overwrite, revoke access, or perform an irreversible action."
       }
     },
+    "get_upload_url": {
+      "annotations": {"readOnlyHint": false, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Creates a short-lived upload authorization for an owned product image.",
+        "open_world_justification": "Creates a private upload token and does not publish or change public internet state by itself.",
+        "destructive_justification": "Mints a temporary upload URL but does not delete, overwrite, revoke access, or perform an irreversible action."
+      }
+    },
     "get_my_inventory": {
       "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
       "justifications": {
