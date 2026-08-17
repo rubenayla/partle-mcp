@@ -1,5 +1,7 @@
 # Partle Marketplace MCP Server
 
+[![Verified on MseeP](https://mseep.ai/badge.svg)](https://mseep.ai/app/6a91b129-5935-4d2a-90a9-09c74de3414e)
+
 [Model Context Protocol](https://modelcontextprotocol.io/) server for the Partle marketplace — let your AI shop here: search products and stores, get prices and purchase links, or ask it to add a listing for you, all without leaving your assistant.
 
 **130,000+ products** across **~16,000 stores**. Reads need no auth. Writes need a `pk_…` API key.
