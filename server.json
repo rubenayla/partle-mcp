@@ -3,7 +3,7 @@
   "name": "xyz.rubenayla.partle/marketplace",
   "title": "Partle Marketplace",
   "description": "Let your AI shop here. Search products and stores in the Partle marketplace.",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "repository": {
     "url": "https://github.com/rubenayla/partle-mcp",
     "source": "github"

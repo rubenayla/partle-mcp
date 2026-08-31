@@ -302,13 +302,13 @@ def search_wanted(
     Read-only. No authentication. Rate-limited 100 req/hour per IP.
 
     Args:
-        query: Free-text filter over title + description (case-insensitive
+        query: Free-text filter over name + description (case-insensitive
             substring). Omit to list everything, newest first.
         limit: Max results (1–100, default 20).
         offset: Pagination offset.
 
     Returns:
-        A list of open buy requests. Each includes ``id``, ``title``,
+        A list of open buy requests. Each includes ``id``, ``name``,
         ``description``, ``quantity``, ``max_price`` + ``currency`` (if
         the poster set a ceiling), ``contact`` (if they left an
         email/phone/handle), ``reference_url``, ``posted_by`` (display
@@ -905,7 +905,7 @@ def mark_sold(api_key: str, item_id: int) -> dict:
 )
 def create_buy_request(
     api_key: str,
-    title: str,
+    name: str,
     description: Optional[str] = None,
     quantity: int = 1,
     max_price: Optional[float] = None,
@@ -925,7 +925,7 @@ def create_buy_request(
 
     Args:
         api_key: Partle API key (`pk_` prefix).
-        title: Short scannable headline ("Looking for X"). Required.
+        name: Short scannable headline ("Looking for X"). Required.
         description: Markdown long-form — specs, constraints, delivery
             preference. The supplier reads this to decide whether they
             can fulfil.
@@ -943,7 +943,7 @@ def create_buy_request(
         The newly-created buy request including its ``id`` and the
         public URL where it shows up.
     """
-    payload: dict[str, Any] = {"title": title, "quantity": int(quantity)}
+    payload: dict[str, Any] = {"name": name, "quantity": int(quantity)}
     if description is not None:
         payload["description"] = description
     if max_price is not None:

@@ -4,7 +4,7 @@
 
 [Model Context Protocol](https://modelcontextprotocol.io/) server for the Partle marketplace — let your AI shop here: search products and stores, get prices and purchase links, or ask it to add a listing for you, all without leaving your assistant.
 
-**130,000+ products** across **~16,000 stores**. Reads need no auth. Writes need a `pk_…` API key.
+Live product and store coverage is available through the `get_stats` tool. Public catalogue reads need no auth. Writes and private inventory reads need OAuth or a `pk_…` API key.
 
 ## Two ways to run it
 
@@ -100,7 +100,7 @@ Two ways to authenticate, in preference order:
 
 | Tool | Purpose |
 |------|---------|
-| `create_buy_request` | Post a public buy request (title, description, quantity, optional `max_price` and `contact`). |
+| `create_buy_request` | Post a public buy request (name, description, quantity, optional `max_price` and `contact`). |
 
 ### Feedback
 
